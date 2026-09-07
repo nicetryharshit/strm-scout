@@ -19,6 +19,7 @@ It runs locally and works without Unity. You can drag a `.strm` file into the wi
 - `src/` contains the React UI
 - `src-tauri/` contains the Rust backend and STRM parsing/decoding logic
 - `Build-Windows.ps1` and `Build-Windows.cmd` are helper scripts for Windows packaging
+- `Build-macOS.sh` and `Build-macOS.command` are helper scripts for macOS packaging
 
 ## Requirements
 
@@ -29,6 +30,7 @@ For development you need:
 - Tauri prerequisites for your platform
 
 On Windows, you also need WebView2 and the native build tools required by Tauri.
+On macOS, you need Xcode command line tools and the usual Tauri prerequisites for macOS builds.
 
 ## Development
 
@@ -53,7 +55,10 @@ Build the app with:
 npm run build
 ```
 
-On Windows, the helper scripts in the repository can be used for portable packaging.
+For desktop packaging:
+
+- Windows: `npm run build:windows` or run `Build-Windows.ps1`
+- macOS: `npm run build:mac` or double-click `Build-macOS.command`
 
 ## Export output
 

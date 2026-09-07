@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:mac": "NO_PAUSE=1 bash ./Build-macOS.sh",
+    "build:windows": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File ./Build-Windows.ps1 -NoPause",
     "tauri": "tauri"
   },
   "dependencies": {
