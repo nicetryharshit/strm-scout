@@ -1,0 +1,22 @@
+[package]
+name = "strm-inspector"
+version = "0.1.0"
+description = "Offline STRM image sequence inspector and exporter"
+authors = ["STRM Inspector contributors"]
+edition = "2021"
+
+[lib]
+name = "strm_inspector_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+image = { version = "0.25", default-features = false, features = ["png"] }
+lz4_flex = { version = "0.14", default-features = false, features = ["std", "safe-decode"] }
+serde = { version = "1", features = ["derive"] }
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+texture2ddecoder = "0.1.2"
+
