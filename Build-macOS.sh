@@ -31,8 +31,11 @@ done
 printf 'Installing JavaScript dependencies...\n'
 npm install
 
-printf 'Building the macOS app bundle...\n'
-npm run tauri build
+printf 'Building the macOS binary...\n'
+npm exec tauri -- build --no-bundle
+
+printf 'Bundling the macOS app...\n'
+npm exec tauri -- bundle --bundles app
 
 app_bundle="$project_root/src-tauri/target/release/bundle/macos/STRM Inspector.app"
 if [[ ! -d "$app_bundle" ]]; then
