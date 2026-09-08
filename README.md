@@ -2,8 +2,6 @@
 
 STRM Inspector is a Tauri 2 desktop app for opening, inspecting, and exporting `.strm` image streams.
 
-It runs locally and works without Unity. You can drag a `.strm` file into the window or use the file picker, then browse the stream frame by frame, inspect named sections, play the animation, and export PNGs.
-
 ## What it does
 
 - Loads STRM version 2 files
