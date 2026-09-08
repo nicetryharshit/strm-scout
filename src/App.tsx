@@ -177,7 +177,7 @@ export default function App() {
   };
 
   return <div className={`app-shell ${darkMode ? "dark" : ""}`}>
-    <style>{`.viewer,.canvas-stage{background-color:#f3f3f3;background-image:linear-gradient(45deg,#fff 25%,transparent 25%),linear-gradient(-45deg,#fff 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#fff 75%),linear-gradient(-45deg,transparent 75%,#fff 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}.inspector{overflow:hidden}.export-section{min-height:0;overflow:hidden}.export-section .check-list{max-height:220px;overflow-y:auto;padding-right:4px}.fake-check{flex:0 0 16px;background:#fff}.dark .sidebar,.dark .inspector,.dark .transport,.dark .file-card,.dark .empty-glyph,.dark .pattern-row input,.dark .transport-buttons button,.dark .transport select{background:#24272b;color:#f4f4f2}.dark .viewer,.dark .canvas-stage{background-color:#f3f3f3}.dark .app-mark{background:#f4f4f2;color:#17191c}.dark .fake-check{background:#fff;border-color:#f4f4f2;color:#17191c}.dark .check-list input:checked+.fake-check{background:#f4f4f2;color:#17191c}.dark .button{border-color:#596169;background:#24272b;color:#f4f4f2}.dark .button.primary,.dark .transport-buttons .play{background:#f4f4f2;border-color:#f4f4f2;color:#17191c}.dark .export-pattern,.dark .export-option,.dark .range-row.active{background:#30343a;border-color:#596169}.theme-toggle{margin-left:auto}.titlebar .theme-toggle+.button{margin-left:0}`}</style>
+    <style>{`.app-shell{height:100dvh;min-height:0;grid-template-rows:58px minmax(0,1fr) 28px;background:#f3f3f3;color:#262626}.workspace{min-height:0}.viewer{background:#f3f3f3}.canvas-stage{background:#f3f3f3;padding:18px}.inspector{overflow:hidden;min-height:0;background:#fff;color:#262626}.inspect-section{padding:10px 14px}.inspect-section dl{margin:5px 0 0}.inspect-section dl div{min-height:22px}.inspect-section h2{margin:4px 0 7px}.export-section{min-height:0;overflow:hidden}.export-section .check-list{max-height:260px;overflow-y:auto;padding-right:4px}.foldout{min-height:0}.foldout summary{cursor:pointer;list-style:none}.foldout summary::-webkit-details-marker{display:none}.foldout summary:before{content:'+';display:inline-block;width:16px;color:#737980;font-weight:700}.foldout[open] summary:before{content:'−'}.fake-check{flex:0 0 16px;background:#fff}.dark{color:#f4f4f2}.app-shell.dark{background:#25292e}.dark .titlebar,.dark .sidebar,.dark .inspector,.dark .transport,.dark .statusbar,.dark .file-card,.dark .empty-glyph,.dark .pattern-row input,.dark .transport-buttons button,.dark .transport select{background:#25292e;color:#f4f4f2}.dark .panel-heading,.dark .eyebrow,.dark .inspect-section dt,.dark .range-copy small,.dark .file-card small,.dark .empty-side,.dark .export-pattern small,.dark .selection-actions button{color:#b9bec4}.dark .viewer,.dark .canvas-stage{background:#30343a;color:#f4f4f2}.dark .empty-state p,.dark .empty-state h1{color:#e5e7e9}.dark .image-checker{background-color:#202328;background-image:linear-gradient(45deg,#30353b 25%,transparent 25%),linear-gradient(-45deg,#30353b 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#30353b 75%),linear-gradient(-45deg,transparent 75%,#30353b 75%);border-color:#596169}.dark .app-mark{background:#f4f4f2;color:#17191c}.dark .fake-check{background:#fff;border-color:#dfe3e7;color:#17191c}.dark .check-list input:checked+.fake-check{background:#f4f4f2;color:#17191c}.dark .button{border-color:#596169;background:#25292e;color:#f4f4f2}.dark .button.primary,.dark .transport-buttons .play{background:#f4f4f2;border-color:#f4f4f2;color:#17191c}.dark .export-pattern,.dark .export-option,.dark .range-row.active{background:#343a41;border-color:#596169}.dark .range-row{color:#f4f4f2}.theme-toggle{margin-left:auto}.titlebar .theme-toggle+.button{margin-left:0}`}</style>
     <header className="titlebar">
       <div className="app-mark">S</div>
       <div><strong>STRM Scout</strong></div>
@@ -230,40 +230,31 @@ export default function App() {
       <aside className="inspector">
         <div className="panel-heading"><span>Inspector</span></div>
         {!info ? <div className="empty-side">Stream properties will appear here.</div> : <>
-          <div className="inspect-section">
-            <span className="eyebrow">Stream</span>
-            <dl><div><dt>Dimensions</dt><dd>{info.width} × {info.height}</dd></div><div><dt>Frames</dt><dd>{info.frameCount}</dd></div><div><dt>Frame rate</dt><dd>{info.fps} fps</dd></div><div><dt>Duration</dt><dd>{(info.frameCount / info.fps).toFixed(2)} s</dd></div><div><dt>Texture</dt><dd>{info.gpuCompressionLabel}</dd></div><div><dt>Compression</dt><dd>LZ4 block</dd></div></dl>
-          </div>
-          <div className="inspect-section">
-            <span className="eyebrow">Selected section</span>
-            <h2>{currentRange?.name}</h2>
-            <dl><div><dt>Frame range</dt><dd>{bounds[0]}–{bounds[1]}</dd></div><div><dt>End action</dt><dd>{currentRange?.endActionLabel}</dd></div></dl>
-            <div className="export-pattern">
-              <span className="eyebrow">File name pattern</span>
-              <div className="pattern-row">
-                <label>
-                  <span>Filename</span>
-                  <input value={exportName} onChange={event => setExportName(event.target.value)} placeholder={info.fileStem || "export"} />
-                </label>
-                <label>
-                  <span>Separator</span>
-                  <input value={exportSeparator} onChange={event => setExportSeparator(event.target.value)} placeholder="_" maxLength={3} />
-                </label>
-                <label>
-                  <span>Start</span>
-                  <input type="number" min={0} value={exportStartNumber} onChange={event => setExportStartNumber(event.target.value)} />
-                </label>
-              </div>
-              <small>Preview: {`${exportName || info.fileStem || "export"}${exportSeparator || "_"}${Number.parseInt(exportStartNumber, 10) || 0}.png`}</small>
-            </div>
-            <button className="button secondary full" onClick={exportFrame}><Download size={15} /> Export current frame</button>
-          </div>
           <div className="inspect-section export-section">
             <span className="eyebrow">Export PNG sequences</span>
             <div className="check-list">{info.ranges.map((range, index) => <label key={`${range.name}-${index}`}><input type="checkbox" checked={checked.includes(index)} onChange={() => toggleChecked(index)} /><span className="fake-check">{checked.includes(index) && <Check size={12} />}</span><span>{range.name}</span></label>)}</div>
             <div className="selection-actions"><button onClick={() => setChecked(info.ranges.map((_, index) => index))}>Select all</button><button onClick={() => setChecked([])}>Clear</button></div>
             <button className="button primary full" onClick={exportRanges} disabled={exporting || checked.length === 0}>{exporting ? <RotateCcw className="spin" size={15} /> : <Download size={15} />}{exporting ? "Exporting…" : `Export ${checked.length} section${checked.length === 1 ? "" : "s"}`}</button>
           </div>
+          <details className="inspect-section foldout">
+            <summary><span className="eyebrow">Stream</span></summary>
+            <dl><div><dt>Dimensions</dt><dd>{info.width} × {info.height}</dd></div><div><dt>Frames</dt><dd>{info.frameCount}</dd></div><div><dt>Frame rate</dt><dd>{info.fps} fps</dd></div><div><dt>Duration</dt><dd>{(info.frameCount / info.fps).toFixed(2)} s</dd></div><div><dt>Texture</dt><dd>{info.gpuCompressionLabel}</dd></div><div><dt>Compression</dt><dd>LZ4 block</dd></div></dl>
+          </details>
+          <details className="inspect-section foldout" open>
+            <summary><span className="eyebrow">Selected section</span></summary>
+            <h2>{currentRange?.name}</h2>
+            <dl><div><dt>Frame range</dt><dd>{bounds[0]}–{bounds[1]}</dd></div><div><dt>End action</dt><dd>{currentRange?.endActionLabel}</dd></div></dl>
+            <div className="export-pattern">
+              <span className="eyebrow">File name pattern</span>
+              <div className="pattern-row">
+                <label><span>Filename</span><input value={exportName} onChange={event => setExportName(event.target.value)} placeholder={info.fileStem || "export"} /></label>
+                <label><span>Separator</span><input value={exportSeparator} onChange={event => setExportSeparator(event.target.value)} placeholder="_" maxLength={3} /></label>
+                <label><span>Start</span><input type="number" min={0} value={exportStartNumber} onChange={event => setExportStartNumber(event.target.value)} /></label>
+              </div>
+              <small>Preview: {`${exportName || info.fileStem || "export"}${exportSeparator || "_"}${Number.parseInt(exportStartNumber, 10) || 0}.png`}</small>
+            </div>
+            <button className="button secondary full" onClick={exportFrame}><Download size={15} /> Export current frame</button>
+          </details>
         </>}
       </aside>
     </main>
