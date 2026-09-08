@@ -1,6 +1,6 @@
-# STRM Inspector
+# STRM Scout
 
-STRM Inspector is a Tauri 2 desktop app for opening, inspecting, and exporting `.strm` image streams.
+STRM Scout is a Tauri 2 desktop app for opening, inspecting, and exporting `.strm` image streams.
 
 ## What it does
 

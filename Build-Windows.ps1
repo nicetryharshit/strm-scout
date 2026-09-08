@@ -35,17 +35,17 @@ try {
     & npm.cmd run tauri build
     if ($LASTEXITCODE -ne 0) { throw "Tauri build failed with exit code $LASTEXITCODE." }
 
-    $exe = Join-Path $projectRoot "src-tauri\target\release\strm-inspector.exe"
+    $exe = Join-Path $projectRoot "src-tauri\target\release\strm-scout.exe"
     if (-not (Test-Path $exe)) { throw "Tauri completed without creating $exe." }
 
-    $portable = Join-Path $projectRoot "dist\STRM-Inspector-Portable"
+    $portable = Join-Path $projectRoot "dist\STRM-Scout-Portable"
     New-Item -ItemType Directory -Force -Path $portable | Out-Null
-    Copy-Item $exe (Join-Path $portable "STRM-Inspector.exe") -Force
-    Compress-Archive -Path (Join-Path $portable "*") -DestinationPath (Join-Path $projectRoot "dist\STRM-Inspector-Portable.zip") -Force
+    Copy-Item $exe (Join-Path $portable "STRM-Scout.exe") -Force
+    Compress-Archive -Path (Join-Path $portable "*") -DestinationPath (Join-Path $projectRoot "dist\STRM-Scout-Portable.zip") -Force
 
     Write-Host "`nBUILD COMPLETE" -ForegroundColor Green
     Write-Host "Portable app: $portable"
-    Write-Host "Shareable ZIP: $projectRoot\dist\STRM-Inspector-Portable.zip"
+    Write-Host "Shareable ZIP: $projectRoot\dist\STRM-Scout-Portable.zip"
 }
 catch {
     Stop-Build $_.Exception.Message

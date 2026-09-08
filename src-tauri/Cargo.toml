@@ -1,8 +1,8 @@
 [package]
-name = "strm-inspector"
+name = "strm-scout"
 version = "0.1.0"
 description = "Offline STRM image sequence inspector and exporter"
-authors = ["STRM Inspector contributors"]
+authors = ["STRM Scout contributors"]
 edition = "2021"
 
 [lib]
@@ -19,4 +19,3 @@ serde = { version = "1", features = ["derive"] }
 tauri = { version = "2", features = [] }
 tauri-plugin-dialog = "2"
 texture2ddecoder = "0.1.2"
-

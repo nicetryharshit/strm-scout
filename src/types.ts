@@ -11,6 +11,7 @@ export type FrameRange = {
 export type StreamInfo = {
   path: string;
   fileName: string;
+  fileStem: string;
   fileSize: number;
   version: number;
   width: number;

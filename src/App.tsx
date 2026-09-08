@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { open } from "@tauri-apps/plugin-dialog";
-import { Check, ChevronLeft, ChevronRight, Download, FileImage, FolderOpen, Pause, Play, RotateCcw, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Download, FileImage, FolderOpen, Moon, Pause, Play, RotateCcw, Sun, X } from "lucide-react";
 import type { FrameRange, StreamInfo } from "./types";
 
 const frameBounds = (range: FrameRange | null, info: StreamInfo) => range && range.begin >= 0
@@ -20,7 +20,16 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [status, setStatus] = useState("Open an STRM file to begin");
+  const [exportName, setExportName] = useState("");
+  const [exportSeparator, setExportSeparator] = useState("_");
+  const [exportStartNumber, setExportStartNumber] = useState("0");
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("strm-scout-theme") === "dark");
   const frameRequest = useRef(0);
+  const frameBusy = useRef(false);
+
+  useEffect(() => {
+    localStorage.setItem("strm-scout-theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
   useEffect(() => {
     const preventContextMenu = (event: MouseEvent) => event.preventDefault();
@@ -33,6 +42,8 @@ export default function App() {
 
   const showFrame = useCallback(async (index: number) => {
     if (!info) return;
+    if (frameBusy.current) return;
+    frameBusy.current = true;
     const request = ++frameRequest.current;
     try {
       const data = await invoke<ArrayBuffer>("decode_frame", { index });
@@ -46,6 +57,8 @@ export default function App() {
     } catch (error) {
       setPlaying(false);
       setStatus(String(error));
+    } finally {
+      frameBusy.current = false;
     }
   }, [info]);
 
@@ -56,6 +69,9 @@ export default function App() {
     try {
       const loaded = await invoke<StreamInfo>("load_strm", { path });
       setInfo(loaded);
+      setExportName(loaded.fileStem || "export");
+      setExportSeparator("_");
+      setExportStartNumber("0");
       setSelected(0);
       setChecked(loaded.ranges.map((_, index) => index));
       setFrame(0);
@@ -127,7 +143,13 @@ export default function App() {
     setExporting(true);
     setStatus("Exporting PNG sequences…");
     try {
-      const result = await invoke<string>("export_ranges", { directory, rangeIndexes: checked });
+      const result = await invoke<string>("export_ranges", {
+        directory,
+        rangeIndexes: checked,
+        fileName: exportName || info.fileStem || "export",
+        separator: exportSeparator || "_",
+        startNumber: Number.parseInt(exportStartNumber, 10) || 0,
+      });
       setStatus(result);
     } catch (error) {
       setStatus(String(error));
@@ -141,17 +163,25 @@ export default function App() {
     const directory = await open({ directory: true, multiple: false, title: "Choose export folder" });
     if (!directory) return;
     try {
-      const result = await invoke<string>("export_frame", { directory, index: frame });
+      const result = await invoke<string>("export_frame", {
+        directory,
+        index: frame,
+        fileName: exportName || info.fileStem || "export",
+        separator: exportSeparator || "_",
+        startNumber: Number.parseInt(exportStartNumber, 10) || 0,
+      });
       setStatus(result);
     } catch (error) {
       setStatus(String(error));
     }
   };
 
-  return <div className="app-shell">
+  return <div className={`app-shell ${darkMode ? "dark" : ""}`}>
+    <style>{`.viewer,.canvas-stage{background-color:#f3f3f3;background-image:linear-gradient(45deg,#fff 25%,transparent 25%),linear-gradient(-45deg,#fff 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#fff 75%),linear-gradient(-45deg,transparent 75%,#fff 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}.inspector{overflow:hidden}.export-section{min-height:0;overflow:hidden}.export-section .check-list{max-height:220px;overflow-y:auto;padding-right:4px}.fake-check{flex:0 0 16px;background:#fff}.dark .sidebar,.dark .inspector,.dark .transport,.dark .file-card,.dark .empty-glyph,.dark .pattern-row input,.dark .transport-buttons button,.dark .transport select{background:#24272b;color:#f4f4f2}.dark .viewer,.dark .canvas-stage{background-color:#f3f3f3}.dark .app-mark{background:#f4f4f2;color:#17191c}.dark .fake-check{background:#fff;border-color:#f4f4f2;color:#17191c}.dark .check-list input:checked+.fake-check{background:#f4f4f2;color:#17191c}.dark .button{border-color:#596169;background:#24272b;color:#f4f4f2}.dark .button.primary,.dark .transport-buttons .play{background:#f4f4f2;border-color:#f4f4f2;color:#17191c}.dark .export-pattern,.dark .export-option,.dark .range-row.active{background:#30343a;border-color:#596169}.theme-toggle{margin-left:auto}.titlebar .theme-toggle+.button{margin-left:0}`}</style>
     <header className="titlebar">
       <div className="app-mark">S</div>
-      <div><strong>STRM Inspector</strong><span>BC7 stream viewer and exporter</span></div>
+      <div><strong>STRM Scout</strong></div>
+      <button className="button theme-toggle" onClick={() => setDarkMode(value => !value)} aria-label={darkMode ? "Use light mode" : "Use dark mode"}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}{darkMode ? "Light" : "Dark"}</button>
       <button className="button primary" onClick={openFile}><FolderOpen size={16} /> Open file</button>
     </header>
 
@@ -208,6 +238,24 @@ export default function App() {
             <span className="eyebrow">Selected section</span>
             <h2>{currentRange?.name}</h2>
             <dl><div><dt>Frame range</dt><dd>{bounds[0]}–{bounds[1]}</dd></div><div><dt>End action</dt><dd>{currentRange?.endActionLabel}</dd></div></dl>
+            <div className="export-pattern">
+              <span className="eyebrow">File name pattern</span>
+              <div className="pattern-row">
+                <label>
+                  <span>Filename</span>
+                  <input value={exportName} onChange={event => setExportName(event.target.value)} placeholder={info.fileStem || "export"} />
+                </label>
+                <label>
+                  <span>Separator</span>
+                  <input value={exportSeparator} onChange={event => setExportSeparator(event.target.value)} placeholder="_" maxLength={3} />
+                </label>
+                <label>
+                  <span>Start</span>
+                  <input type="number" min={0} value={exportStartNumber} onChange={event => setExportStartNumber(event.target.value)} />
+                </label>
+              </div>
+              <small>Preview: {`${exportName || info.fileStem || "export"}${exportSeparator || "_"}${Number.parseInt(exportStartNumber, 10) || 0}.png`}</small>
+            </div>
             <button className="button secondary full" onClick={exportFrame}><Download size={15} /> Export current frame</button>
           </div>
           <div className="inspect-section export-section">

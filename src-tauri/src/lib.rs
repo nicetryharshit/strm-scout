@@ -23,18 +23,18 @@ fn decode_frame(index: usize, state: tauri::State<AppState>) -> Result<Response,
 }
 
 #[tauri::command]
-fn export_frame(directory: String, index: usize, state: tauri::State<AppState>) -> Result<String, String> {
+fn export_frame(directory: String, index: usize, file_name: String, separator: String, start_number: usize, state: tauri::State<AppState>) -> Result<String, String> {
     let guard = state.0.lock().map_err(|_| "Stream state is unavailable".to_string())?;
     let stream = guard.as_ref().ok_or_else(|| "No STRM file is open".to_string())?;
-    let path = stream.export_frame(PathBuf::from(directory), index)?;
+    let path = stream.export_frame(PathBuf::from(directory), index, &file_name, &separator, start_number)?;
     Ok(format!("Exported {}", path.display()))
 }
 
 #[tauri::command]
-fn export_ranges(directory: String, range_indexes: Vec<usize>, state: tauri::State<AppState>) -> Result<String, String> {
+fn export_ranges(directory: String, range_indexes: Vec<usize>, file_name: String, separator: String, start_number: usize, state: tauri::State<AppState>) -> Result<String, String> {
     let guard = state.0.lock().map_err(|_| "Stream state is unavailable".to_string())?;
     let stream = guard.as_ref().ok_or_else(|| "No STRM file is open".to_string())?;
-    let count = stream.export_ranges(PathBuf::from(directory), &range_indexes)?;
+    let count = stream.export_ranges(PathBuf::from(directory), &range_indexes, &file_name, &separator, start_number)?;
     Ok(format!("Exported {count} PNG frames"))
 }
 
@@ -45,5 +45,5 @@ pub fn run() {
         .manage(AppState(Mutex::new(None)))
         .invoke_handler(tauri::generate_handler![load_strm, decode_frame, export_frame, export_ranges])
         .run(tauri::generate_context!())
-        .expect("failed to run STRM Inspector");
+        .expect("failed to run STRM Scout");
 }

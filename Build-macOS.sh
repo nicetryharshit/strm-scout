@@ -37,13 +37,13 @@ npm exec tauri -- build --no-bundle
 printf 'Bundling the macOS app...\n'
 npm exec tauri -- bundle --bundles app
 
-app_bundle="$project_root/src-tauri/target/release/bundle/macos/STRM Inspector.app"
+app_bundle="$project_root/src-tauri/target/release/bundle/macos/STRM Scout.app"
 if [[ ! -d "$app_bundle" ]]; then
     fail "Tauri completed without creating $app_bundle."
 fi
 
 dist_dir="$project_root/dist"
-zip_path="$dist_dir/STRM-Inspector-Mac.zip"
+zip_path="$dist_dir/STRM-Scout-Mac.zip"
 
 mkdir -p "$dist_dir"
 rm -f "$zip_path"

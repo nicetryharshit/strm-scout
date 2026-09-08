@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "STRM Inspector",
+  "productName": "STRM Scout",
   "version": "0.1.0",
   "identifier": "com.argos.strminspector",
   "build": {
@@ -11,7 +11,7 @@
   },
   "app": {
     "windows": [{
-      "title": "STRM Inspector",
+      "title": "STRM Scout",
       "width": 1240,
       "height": 780,
       "minWidth": 900,
